@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-ip="http://www.springframework.org/schema/integration/ip"
+	xmlns:int-jmx="http://www.springframework.org/schema/integration/jmx"
+	xmlns:int-stream="http://www.springframework.org/schema/integration/stream"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/integration/stream http://www.springframework.org/schema/integration/stream/spring-integration-stream.xsd
+		http://www.springframework.org/schema/integration/ip http://www.springframework.org/schema/integration/ip/spring-integration-ip.xsd
+		http://www.springframework.org/schema/integration/jmx http://www.springframework.org/schema/integration/jmx/spring-integration-jmx.xsd">
+
+	<context:property-placeholder />
+
+	<int:channel id="incomingServerChannel" datatype="java.lang.String">
+		<int:queue />
+	</int:channel>
+
+	<bean id="integrationConversionService"
+		class="org.springframework.context.support.ConversionServiceFactoryBean">
+		<property name="converters">
+			<list>
+				<bean class="test.ByteArrayToStringConverter" />
+			</list>
+		</property>
+	</bean>
+
+	<int-ip:tcp-connection-factory id="serverConnectionFactory"
+		type="server" port="9000" backlog="100" single-use="false" so-timeout="5000"
+		lookup-host="false" deserializer="connectionSerializeDeserialize" so-linger="3000" using-nio="true"  />
+
+	<int-ip:tcp-inbound-channel-adapter
+		auto-startup="true" channel="incomingServerChannel"
+		connection-factory="serverConnectionFactory" error-channel="errorChannel" />
+
+	<bean id="connectionSerializeDeserialize"
+		class="org.springframework.integration.ip.tcp.serializer.ByteArrayRawSerializer" />
+
+	<int-stream:stdout-channel-adapter
+		channel="incomingServerChannel" auto-startup="true" append-newline="true" />
+
+	<int:poller fixed-rate="100" default="true" id="defaultPoller"></int:poller>
+
+
+</beans>
