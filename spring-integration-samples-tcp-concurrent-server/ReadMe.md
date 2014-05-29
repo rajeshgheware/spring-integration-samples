@@ -1,6 +1,7 @@
-Sample configuration that I tested for 3900 concurrent TCP requests sending Hello string (see the 'TCP Server.jmx' as JMeter file)
+Sample configuration that I tested for 1000 concurrent TCP requests sending Hello string (see the 'TCP Server.jmx' as JMeter file).  Machine used was Intel i5 4g RAM Windows 7,  64 bit
 
-Today tried on below machine and it handled 3900 concurrent clients.  
+
+Today (May 29, 2014) tried on below machine and it handled 3900 concurrent clients.  
 
 Machine spec:
 
